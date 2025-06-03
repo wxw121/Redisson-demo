@@ -1,0 +1,98 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: delay-queue-service
+
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/delay_queue?useUnicode=true&characterEncoding=utf-8&useSSL=false&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true
+    username: root
+    password: root
+    hikari:
+      minimum-idle: 5
+      maximum-pool-size: 15
+      idle-timeout: 30000
+      pool-name: HikariCP
+      max-lifetime: 1800000
+      connection-timeout: 30000
+      connection-test-query: SELECT 1
+      auto-commit: true
+      validation-timeout: 3000
+
+  data:
+    redis:
+      host: localhost
+      port: 6379
+      database: 0
+      # password: your-password  # 如果Redis需要密码，取消注释此行
+      timeout: 3000
+      client-type: redisson  # 明确指定使用 Redisson
+#      redisson:
+#        config:
+#          singleServerConfig:
+#            address: "redis://localhost:6379"
+#            database: 0
+#            # password: 如果有密码，取消注释并设置密码
+#            connectionMinimumIdleSize: 8
+#            connectionPoolSize: 32
+#            connectTimeout: 10000
+#            idleConnectionTimeout: 10000
+#            retryAttempts: 3
+#            retryInterval: 1500
+#            subscriptionsPerConnection: 5
+#            subscriptionConnectionMinimumIdleSize: 1
+#            subscriptionConnectionPoolSize: 50
+
+# MyBatis-Plus配置
+mybatis-plus:
+  configuration:
+    map-underscore-to-camel-case: true
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+    # 开启二级缓存
+    cache-enabled: true
+    # 设置本地缓存作用域
+    local-cache-scope: statement
+    # 关闭积极加载
+    aggressive-lazy-loading: false
+  global-config:
+    db-config:
+      logic-delete-field: deleted
+      logic-delete-value: 1
+      logic-not-delete-value: 0
+      id-type: auto
+      # 表名前缀
+      table-prefix: t_
+  mapper-locations: classpath*:/mapper/**/*.xml
+  type-aliases-package: org.example.entity
+  type-enums-package: org.example.enums
+#  type-handlers-package: org.example.config.typehandler
+
+# 订单配置
+order:
+  paymentTimeoutMinutes: 30  # 订单超时时间（分钟）
+  minimumAmount: 0.01  # 最小订单金额
+  maximumAmount: 100000.00  # 最大订单金额
+  orderNoPrefix: ORDER_  # 订单号前缀
+
+# 日志配置
+logging:
+  level:
+    root: info
+    org.example: debug
+    org.springframework: info
+    org.redisson: info
+    com.zaxxer.hikari: info
+    com.baomidou.mybatisplus: info
+  pattern:
+    console: "%clr(%d{yyyy-MM-dd HH:mm:ss.SSS}){faint} %clr(${LOG_LEVEL_PATTERN:-%5p}) %clr(${PID:- }){magenta} %clr(---){faint} %clr([%15.15t]){faint} %clr(%-40.40logger{39}){cyan} %clr(:){faint} %m%n${LOG_EXCEPTION_CONVERSION_WORD:-%wEx}"
+    file: "%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{50} - %msg%n"
+  file:
+    name: logs/delay-queue.log
+  logback:
+    rollingpolicy:
+      max-file-size: 10MB
+      max-history: 30
+      total-size-cap: 3GB
+      file-name-pattern: logs/delay-queue.%d{yyyy-MM-dd}.%i.log

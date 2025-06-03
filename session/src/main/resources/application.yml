@@ -1,0 +1,42 @@
+server:
+  port: 8080
+  servlet:
+    session:
+      timeout: 1800  # 会话超时时间，单位秒
+
+spring:
+  application:
+    name: redisson-session-demo
+  session:
+    store-type: redis
+    redis:
+      namespace: spring:session  # Redis key前缀
+      repository-type: indexed   # 使用indexed类型支持cron清理
+      flush-mode: on_save       # 会话刷新模式
+      cleanup-cron: "0 * * * * *"  # 每分钟清理过期会话
+  data:
+    redis:
+      host: localhost
+      port: 6379
+      database: 0
+      # password: your-password  # 如果Redis需要密码，取消注释此行
+      timeout: 3000
+      redisson:
+        config: |
+          singleServerConfig:
+            address: "redis://localhost:6379"
+            database: 0
+            # password: your-password  # 如果Redis需要密码，取消注释此行
+            connectionMinimumIdleSize: 1
+            connectionPoolSize: 4
+            idleConnectionTimeout: 10000
+            connectTimeout: 10000
+            timeout: 3000
+            retryAttempts: 3
+            retryInterval: 1500
+
+logging:
+  level:
+    org.example: DEBUG
+    org.springframework.session: DEBUG
+    org.springframework.data.redis: INFO
