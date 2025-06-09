@@ -15,6 +15,7 @@
 redisson-demo/
 ├── delayQueue/          # 分布式延迟队列模块
 ├── session/             # 分布式Session管理模块
+├── multiLevelCacheSync/ # 多级缓存同步模块
 ├── pom.xml             # 父项目POM文件
 └── README.md           # 项目说明文档
 ```
@@ -28,6 +29,13 @@ redisson-demo/
 ### 2. session
 基于Spring Session和Redis的分布式会话管理实现，用于多节点间的session共享。
 - [查看session模块详细说明](session/README.md)
+
+### 3. multiLevelCacheSync
+基于Redisson的多级缓存同步实现，支持本地缓存与Redis的数据同步，提供高性能的缓存访问方案。
+- 支持本地缓存与Redis的双向同步
+- 实现缓存一致性保证
+- 提供批量操作支持
+- [查看multiLevelCacheSync模块详细说明](multiLevelCacheSync/README.md)
 
 ## 技术栈
 

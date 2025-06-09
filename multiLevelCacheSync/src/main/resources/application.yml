@@ -1,0 +1,177 @@
+server:
+  port: 8080
+  servlet:
+    context-path: /
+
+spring:
+  application:
+    name: multi-level-cache-demo
+
+  # Redis配置
+  redis:
+    host: localhost
+    port: 6379
+    database: 0
+    timeout: 10000
+    # 如果有密码，取消下面的注释并设置密码
+    # password: your_password
+
+    # Redisson配置
+    redisson:
+      config: |
+        singleServerConfig:
+          address: "redis://${spring.redis.host}:${spring.redis.port}"
+          database: ${spring.redis.database}
+          timeout: ${spring.redis.timeout}
+          # 如果有密码，取消下面的注释并设置密码
+          # password: ${spring.redis.password}
+        threads: 16
+        nettyThreads: 32
+        transportMode: "NIO"
+
+# 缓存配置
+cache:
+  enabled: true
+  node-id: ${HOSTNAME:node-1}  # 默认使用主机名，如果获取不到则使用node-1
+
+  # 本地缓存配置（L1）
+  local:
+    enabled: true
+    initial-capacity: 100
+    maximum-size: 10000
+    expire-after-write: 300    # 秒
+    expire-after-access: 300   # 秒
+    stats-enabled: true
+
+  # Redis缓存配置（L2）
+  redis:
+    enabled: true
+    time-to-live: 1800        # 秒
+    key-prefix: "cache:"
+
+  # 防护配置
+  protection:
+    # 缓存击穿防护
+    lock:
+      enabled: true
+      wait-time: 3000        # 毫秒
+      lease-time: 30000      # 毫秒
+
+    # 缓存穿透防护
+    null-value:
+      enabled: true
+      timeout: 300          # 秒
+
+    # 缓存雪崩防护
+    ttl-randomization:
+      enabled: true
+      variance: 0.1         # 10%的随机变化范围
+
+  # 同步配置
+  sync:
+    enabled: true
+    topic: "cache:events"
+    batch-size: 100
+    queue-capacity: 1000
+
+  # 事件配置
+  event:
+    enabled: true
+    # 事件处理配置
+    handler:
+      pool-size: 4
+      queue-capacity: 1000
+    # 去重配置
+    dedup:
+      enabled: true
+      expire-after: 300     # 秒
+      max-size: 10000
+
+  # 统计配置
+  stats:
+    enabled: true
+    log-interval: 300       # 秒
+    metrics-enabled: true
+
+  # 批量操作配置
+  batch:
+    enabled: true
+    max-size: 100
+    timeout: 5000          # 毫秒
+
+  # 默认缓存配置
+  default:
+    local:
+      maximum-size: 1000
+      expire-after-write: 600    # 秒
+      expire-after-access: 300   # 秒
+    redis:
+      time-to-live: 1800        # 秒
+    protection:
+      null-value-enabled: true
+      lock-enabled: true
+    sync:
+      enabled: true
+
+  # 特定缓存配置
+  caches:
+    # 用户缓存配置
+    userCache:
+      local:
+        maximum-size: 2000
+        expire-after-write: 1800   # 秒
+        expire-after-access: 900   # 秒
+      redis:
+        time-to-live: 3600        # 秒
+      protection:
+        null-value-enabled: true
+        lock-enabled: true
+      sync:
+        enabled: true
+
+    # 产品缓存配置
+    productCache:
+      local:
+        maximum-size: 5000
+        expire-after-write: 3600   # 秒
+        expire-after-access: 1800  # 秒
+      redis:
+        time-to-live: 7200        # 秒
+      protection:
+        null-value-enabled: true
+        lock-enabled: true
+      sync:
+        enabled: true
+
+# Actuator配置
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,cache-monitor,prometheus
+  endpoint:
+    health:
+      show-details: always
+    cache-monitor:
+      enabled: true
+  metrics:
+    tags:
+      application: ${spring.application.name}
+    export:
+      prometheus:
+        enabled: true
+
+# 日志配置
+logging:
+  level:
+    root: INFO
+    org.example: DEBUG
+    org.springframework.cache: DEBUG
+    org.redisson: INFO
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n"
+    file: "%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n"
+  file:
+    name: logs/multi-level-cache.log
+    max-size: 10MB
+    max-history: 7

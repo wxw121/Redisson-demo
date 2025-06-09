@@ -14,6 +14,7 @@
     <modules>
         <module>delayQueue</module>
         <module>session</module>
+        <module>multiLevelCacheSync</module>
     </modules>
 
     <properties>
