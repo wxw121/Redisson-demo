@@ -1,10 +1,9 @@
 server:
-  port: 8080
+  port: 8081
 
 spring:
   application:
     name: delay-queue-service
-
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
     url: jdbc:mysql://localhost:3306/delay_queue?useUnicode=true&characterEncoding=utf-8&useSSL=false&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true
@@ -20,7 +19,6 @@ spring:
       connection-test-query: SELECT 1
       auto-commit: true
       validation-timeout: 3000
-
   data:
     redis:
       host: localhost
@@ -28,7 +26,6 @@ spring:
       database: 0
       # password: your-password  # 如果Redis需要密码，取消注释此行
       timeout: 3000
-      client-type: redisson  # 明确指定使用 Redisson
 #      redisson:
 #        config:
 #          singleServerConfig:
@@ -67,7 +64,6 @@ mybatis-plus:
   mapper-locations: classpath*:/mapper/**/*.xml
   type-aliases-package: org.example.entity
   type-enums-package: org.example.enums
-#  type-handlers-package: org.example.config.typehandler
 
 # 订单配置
 order:

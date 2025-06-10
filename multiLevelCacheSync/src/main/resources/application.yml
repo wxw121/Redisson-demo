@@ -1,11 +1,26 @@
 server:
-  port: 8080
+  port: 8082
   servlet:
     context-path: /
 
 spring:
   application:
     name: multi-level-cache-demo
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/delay_queue?useUnicode=true&characterEncoding=utf-8&useSSL=false&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true
+    username: root
+    password: root
+    hikari:
+      minimum-idle: 5
+      maximum-pool-size: 15
+      idle-timeout: 30000
+      pool-name: HikariCP
+      max-lifetime: 1800000
+      connection-timeout: 30000
+      connection-test-query: SELECT 1
+      auto-commit: true
+      validation-timeout: 3000
 
   # Redis配置
   redis:
@@ -15,7 +30,6 @@ spring:
     timeout: 10000
     # 如果有密码，取消下面的注释并设置密码
     # password: your_password
-
     # Redisson配置
     redisson:
       config: |
@@ -28,12 +42,11 @@ spring:
         threads: 16
         nettyThreads: 32
         transportMode: "NIO"
-
+HOSTNAME: multi-level-cache-demo
 # 缓存配置
 cache:
   enabled: true
   node-id: ${HOSTNAME:node-1}  # 默认使用主机名，如果获取不到则使用node-1
-
   # 本地缓存配置（L1）
   local:
     enabled: true
@@ -42,13 +55,11 @@ cache:
     expire-after-write: 300    # 秒
     expire-after-access: 300   # 秒
     stats-enabled: true
-
   # Redis缓存配置（L2）
   redis:
     enabled: true
     time-to-live: 1800        # 秒
     key-prefix: "cache:"
-
   # 防护配置
   protection:
     # 缓存击穿防护
@@ -56,24 +67,20 @@ cache:
       enabled: true
       wait-time: 3000        # 毫秒
       lease-time: 30000      # 毫秒
-
     # 缓存穿透防护
     null-value:
       enabled: true
       timeout: 300          # 秒
-
     # 缓存雪崩防护
     ttl-randomization:
       enabled: true
       variance: 0.1         # 10%的随机变化范围
-
   # 同步配置
   sync:
     enabled: true
     topic: "cache:events"
     batch-size: 100
     queue-capacity: 1000
-
   # 事件配置
   event:
     enabled: true
@@ -86,19 +93,18 @@ cache:
       enabled: true
       expire-after: 300     # 秒
       max-size: 10000
-
   # 统计配置
   stats:
     enabled: true
     log-interval: 300       # 秒
     metrics-enabled: true
-
   # 批量操作配置
   batch:
     enabled: true
     max-size: 100
     timeout: 5000          # 毫秒
-
+  warmer:
+    thread-pool-size: 4         # 毫秒
   # 默认缓存配置
   default:
     local:
@@ -112,7 +118,6 @@ cache:
       lock-enabled: true
     sync:
       enabled: true
-
   # 特定缓存配置
   caches:
     # 用户缓存配置
@@ -128,7 +133,6 @@ cache:
         lock-enabled: true
       sync:
         enabled: true
-
     # 产品缓存配置
     productCache:
       local:
@@ -142,7 +146,6 @@ cache:
         lock-enabled: true
       sync:
         enabled: true
-
 # Actuator配置
 management:
   endpoints:
@@ -160,7 +163,6 @@ management:
     export:
       prometheus:
         enabled: true
-
 # 日志配置
 logging:
   level:

@@ -7,7 +7,9 @@ import org.example.cache.event.CacheEvent;
 import org.redisson.api.RTopic;
 import org.redisson.api.RedissonClient;
 import org.springframework.beans.factory.ObjectProvider;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cache.CacheManager;
+import org.springframework.stereotype.Component;
 
 import java.util.Map;
 import java.util.Set;
@@ -19,6 +21,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
  * 使用Redis的发布订阅机制实现分布式缓存同步
  */
 @Slf4j
+@Component
 public class RedissonCacheEventListener implements CacheEventListener {
 
     private final RedissonClient redissonClient;
@@ -37,7 +40,7 @@ public class RedissonCacheEventListener implements CacheEventListener {
             RedissonClient redissonClient,
             ObjectProvider<CacheManager> cacheManagerProvider,
             CacheProperties cacheProperties,
-            String nodeId) {
+            @Value("${cache.node-id}") String nodeId) {
         this.redissonClient = redissonClient;
         this.cacheManagerProvider = cacheManagerProvider;
         this.cacheProperties = cacheProperties;

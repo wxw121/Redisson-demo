@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.example.mapper.UserMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="org.example.entity.User">
+        <id column="id" property="id" />
+        <result column="username" property="username" />
+        <result column="password" property="password" />
+        <result column="email" property="email" />
+        <result column="create_time" property="createTime" />
+        <result column="update_time" property="updateTime" />
+        <result column="status" property="status" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, username, password, email, create_time, update_time, status
+    </sql>
+
+    <!-- 根据用户名模糊查询用户列表 -->
+    <!-- 注意：此方法已在接口中使用@Select注解定义，这里提供XML版本作为替代 -->
+    <select id="selectByUsernameLike" resultMap="BaseResultMap">
+        SELECT
+        <include refid="Base_Column_List" />
+        FROM t_user
+        WHERE username LIKE CONCAT('%', #{username}, '%')
+        AND status = 0
+    </select>
+
+    <!-- 统计用户数量 -->
+    <!-- 注意：此方法已在接口中使用@Select注解定义，这里提供XML版本作为替代 -->
+    <select id="countUsers" resultType="int">
+        SELECT COUNT(*) FROM t_user WHERE status = 0
+    </select>
+
+    <!-- 批量查询用户 -->
+    <select id="selectBatchByIds" resultMap="BaseResultMap">
+        SELECT
+        <include refid="Base_Column_List" />
+        FROM t_user
+        WHERE id IN
+        <foreach collection="idList" item="id" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+        AND status = 0
+    </select>
+
+    <!-- 根据邮箱查询用户 -->
+    <select id="selectByEmail" resultMap="BaseResultMap">
+        SELECT
+        <include refid="Base_Column_List" />
+        FROM t_user
+        WHERE email = #{email}
+        AND status = 0
+    </select>
+
+    <!-- 查询最近注册的用户 -->
+    <select id="selectRecentUsers" resultMap="BaseResultMap">
+        SELECT
+        <include refid="Base_Column_List" />
+        FROM t_user
+        WHERE status = 0
+        ORDER BY create_time DESC
+        LIMIT #{limit}
+    </select>
+
+    <!-- 更新用户邮箱 -->
+    <update id="updateEmail">
+        UPDATE t_user
+        SET email = #{email}, update_time = NOW()
+        WHERE id = #{id}
+    </update>
+
+    <!-- 批量更新用户状态 -->
+    <update id="batchUpdateStatus">
+        UPDATE t_user
+        SET status = #{status}, update_time = NOW()
+        WHERE id IN
+        <foreach collection="idList" item="id" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </update>
+</mapper>

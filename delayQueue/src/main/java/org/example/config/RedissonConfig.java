@@ -1,5 +1,6 @@
 package org.example.config;
 
+import lombok.extern.slf4j.Slf4j;
 import org.redisson.Redisson;
 import org.redisson.api.RedissonClient;
 import org.redisson.codec.JsonJacksonCodec;
@@ -12,6 +13,7 @@ import org.springframework.context.annotation.Configuration;
  * Redisson配置类
  */
 @Configuration
+@Slf4j
 public class RedissonConfig {
 
     @Value("${spring.data.redis.host}")
@@ -32,6 +34,7 @@ public class RedissonConfig {
     @Bean(destroyMethod = "shutdown")
     public RedissonClient redissonClient() {
         Config config = new Config();
+        log.info("RedissonConfig: host=" + host + ", port=" + port + ", database=" + database + ", password=" + password);
 
         // 单节点模式
         config.useSingleServer()

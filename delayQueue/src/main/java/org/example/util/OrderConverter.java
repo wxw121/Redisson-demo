@@ -10,7 +10,7 @@ import org.mapstruct.factory.Mappers;
 /**
  * 订单对象转换器
  */
-@Mapper
+@Mapper(componentModel = "spring")
 public interface OrderConverter {
     OrderConverter INSTANCE = Mappers.getMapper(OrderConverter.class);
 

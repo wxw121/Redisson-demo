@@ -50,6 +50,10 @@ public class CacheWarmer implements ApplicationListener<ApplicationStartedEvent>
         this.multiLevelCacheManager = multiLevelCacheManager;
         this.redisTemplate = redisTemplate;
         this.redissonClient = redissonClient;
+
+        log.info("Cache warmup enabled: {}", warmEnabled);
+        log.info("Cache warmup thread pool size: {}", threadPoolSize);
+        log.info("Cache warmup timeout: {} seconds", timeoutSeconds);
         this.executorService = Executors.newFixedThreadPool(threadPoolSize);
     }
 
