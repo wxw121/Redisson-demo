@@ -19,7 +19,6 @@ import org.springframework.context.annotation.Primary;
  */
 @Slf4j
 @AutoConfiguration
-@EnableConfigurationProperties(CacheProperties.class)
 @ConditionalOnProperty(prefix = "cache", name = "enabled", havingValue = "true", matchIfMissing = true)
 public class MultiLevelCacheAutoConfiguration {
 

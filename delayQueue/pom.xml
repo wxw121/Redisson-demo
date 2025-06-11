@@ -24,7 +24,6 @@
 
         <!-- Dependencies Versions -->
         <lombok-mapstruct-binding.version>0.2.0</lombok-mapstruct-binding.version>
-        <mysql.version>8.0.33</mysql.version>
     </properties>
 
     <dependencies>
@@ -55,8 +54,6 @@
         <dependency>
             <groupId>mysql</groupId>
             <artifactId>mysql-connector-java</artifactId>
-            <version>${mysql.version}</version>
-<!--            <scope>runtime</scope>-->
         </dependency>
 
         <!-- Redis and Redisson -->

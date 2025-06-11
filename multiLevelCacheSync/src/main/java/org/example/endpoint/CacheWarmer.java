@@ -26,14 +26,14 @@ import java.util.concurrent.atomic.AtomicInteger;
 @Component
 public class CacheWarmer implements ApplicationListener<ApplicationStartedEvent> {
 
-    @Value("${cache.warm.enabled:true}")
-    private boolean warmEnabled;
 
-    @Value("${cache.warm.thread-pool-size:4}")
-    private int threadPoolSize;
+    private final boolean warmEnabled;
 
-    @Value("${cache.warm.timeout-seconds:300}")
-    private int timeoutSeconds;
+
+    private final int threadPoolSize;
+
+
+    private final int timeoutSeconds;
 
     private final CacheManager multiLevelCacheManager;
     private final RedisTemplate<String, Object> redisTemplate;
@@ -46,10 +46,17 @@ public class CacheWarmer implements ApplicationListener<ApplicationStartedEvent>
     @Autowired
     public CacheWarmer(CacheManager multiLevelCacheManager,
                       RedisTemplate<String, Object> redisTemplate,
-                      RedissonClient redissonClient) {
+                      RedissonClient redissonClient,
+                       @Value("${cache.warmer.enabled:true}") boolean warmEnabled,
+                       @Value("${cache.warmer.thread-pool-size:4}") int threadPoolSize,
+                       @Value("${cache.warmer.timeout-seconds:300}") int timeoutSeconds) {
         this.multiLevelCacheManager = multiLevelCacheManager;
         this.redisTemplate = redisTemplate;
         this.redissonClient = redissonClient;
+
+        this.warmEnabled = warmEnabled;
+        this.threadPoolSize = threadPoolSize;
+        this.timeoutSeconds = timeoutSeconds;
 
         log.info("Cache warmup enabled: {}", warmEnabled);
         log.info("Cache warmup thread pool size: {}", threadPoolSize);

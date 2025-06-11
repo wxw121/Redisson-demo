@@ -8,6 +8,8 @@ import org.example.service.OrderService;
 import org.redisson.api.RBlockingQueue;
 import org.redisson.api.RedissonClient;
 import org.springframework.beans.factory.InitializingBean;
+import org.springframework.context.ApplicationListener;
+import org.springframework.context.event.ContextClosedEvent;
 import org.springframework.stereotype.Component;
 
 import java.util.concurrent.TimeUnit;
@@ -19,11 +21,15 @@ import java.util.concurrent.TimeUnit;
 @Slf4j
 @Component
 @RequiredArgsConstructor
-public class OrderTimeoutListener implements InitializingBean {
+public class OrderTimeoutListener implements InitializingBean, ApplicationListener<ContextClosedEvent> {
 
     private final RedissonClient redissonClient;
     private final OrderService orderService;
     private static final String ORDER_TIMEOUT_QUEUE = "order:timeout:queue";
+
+
+    private volatile boolean running = true;
+    private Thread listenerThread;
 
     @Override
     public void afterPropertiesSet() {
@@ -36,8 +42,8 @@ public class OrderTimeoutListener implements InitializingBean {
      */
     private void startListener() {
         RBlockingQueue<Order> blockingQueue = redissonClient.getBlockingQueue(ORDER_TIMEOUT_QUEUE);
-        
-        while (!Thread.currentThread().isInterrupted()) {
+
+        while (running && !Thread.currentThread().isInterrupted()) {
             try {
                 // 从队列中获取超时订单
                 Order order = blockingQueue.poll(1, TimeUnit.SECONDS);
@@ -46,10 +52,29 @@ public class OrderTimeoutListener implements InitializingBean {
                 }
             } catch (InterruptedException e) {
                 Thread.currentThread().interrupt();
-                log.error("订单超时监听器被中断", e);
+                log.info("订单超时监听器正常停止");
                 break;
             } catch (Exception e) {
+                if (redissonClient.isShutdown()) {
+                    log.info("Redisson客户端已关闭，停止监听器");
+                    break;
+                }
                 log.error("处理超时订单时发生错误", e);
+            }
+        }
+    }
+
+    // 实现spring的关闭事件监听
+    @Override
+    public void onApplicationEvent(ContextClosedEvent event) {
+        running = false;
+        if (listenerThread != null) {
+            listenerThread.interrupt();  // 中断阻塞的poll操作
+            try {
+                listenerThread.join(2000); // 等待主线程结束。避免僵死线程
+                log.info("订单超时监听器正常停止");
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
             }
         }
     }

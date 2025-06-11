@@ -1,6 +1,7 @@
 package org.example.config;
 
 import lombok.Data;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
 
@@ -55,6 +56,11 @@ public class CacheProperties {
      * 统计配置
      */
     private StatsProperties stats = new StatsProperties();
+
+    /**
+     * 缓存预热配置
+     */
+    private WarmProperties warm = new WarmProperties();
 
     /**
      * 批量操作配置
@@ -307,6 +313,26 @@ public class CacheProperties {
          * 是否启用指标
          */
         private boolean metricsEnabled = true;
+    }
+
+    /**
+     * 预热配置
+     */
+    public static class WarmProperties {
+        /**
+         * 是否启用缓存预热
+         */
+        private boolean warmEnabled;
+
+        /**
+         * 线程池大小
+         */
+        private int threadPoolSize;
+
+        /**
+         * 超时时间（秒）
+         */
+        private int timeoutSeconds;
     }
 
     /**
