@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.example.realtimestats.mapper.PageViewMapper">
+
+    <!-- 批量插入访问记录 -->
+    <insert id="batchInsert" parameterType="java.util.List">
+        INSERT INTO page_view (content_id, user_id, view_time)
+        VALUES
+        <foreach collection="records" item="record" separator=",">
+            (#{record.contentId}, #{record.userId}, #{record.viewTime})
+        </foreach>
+    </insert>
+
+    <!-- 更新每日统计数据 -->
+    <insert id="updateDailyStats">
+        INSERT INTO page_view_daily_stats (content_id, view_date, views)
+        VALUES (#{contentId}, #{date}, #{views})
+        ON DUPLICATE KEY UPDATE
+            views = #{views},
+            update_time = NOW()
+    </insert>
+
+    <!-- 更新每小时统计数据 -->
+    <insert id="updateHourlyStats">
+        INSERT INTO page_view_hourly_stats (content_id, view_hour, views)
+        VALUES (#{contentId}, #{dateTime}, #{views})
+        ON DUPLICATE KEY UPDATE
+            views = #{views},
+            update_time = NOW()
+    </insert>
+
+</mapper>

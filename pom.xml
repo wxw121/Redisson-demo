@@ -15,6 +15,7 @@
         <module>delayQueue</module>
         <module>session</module>
         <module>multiLevelCacheSync</module>
+        <module>realtimeStats</module>
     </modules>
 
     <properties>
