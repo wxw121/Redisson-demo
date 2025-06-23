@@ -16,6 +16,7 @@ redisson-demo/
 ├── delayQueue/          # 分布式延迟队列模块
 ├── session/             # 分布式Session管理模块
 ├── multiLevelCacheSync/ # 多级缓存同步模块
+├── realtimeStats/       # 实时统计模块
 ├── pom.xml             # 父项目POM文件
 └── README.md           # 项目说明文档
 ```
@@ -36,6 +37,13 @@ redisson-demo/
 - 实现缓存一致性保证
 - 提供批量操作支持
 - [查看multiLevelCacheSync模块详细说明](multiLevelCacheSync/README.md)
+
+### 4. realtimeStats
+基于Redisson的实时数据统计模块，提供点赞、浏览等行为的实时统计功能。
+- 支持多种统计维度（点赞、浏览、独立访客等）
+- 实现批量数据同步机制
+- 提供可配置的缓存过期策略
+- [查看realtimeStats模块详细说明](realtimeStats/README.md)
 
 ## 技术栈
 
